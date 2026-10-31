@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
+<title>Moët or Munch</title>
+<style>
+  :root{
+    --felt-1:#0c6b33;
+    --felt-2:#0a4524;
+    --gold:#f3d179;
+    --gold-bright:#ffe9ab;
+    --gold-dark:#b4913b;
+    --card-back:#7a1030;
+    --card-back-2:#4e0a1e;
+    --red:#d42638;
+    --panel:#0e2616;
+    --ink:#f4ead0;
+    --muted:#bcd3c2;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    overflow:hidden;
+    font-family: Georgia, 'Times New Roman', serif;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 38%, rgba(255,255,255,.08) 0%, transparent 60%),
+      radial-gradient(ellipse at center, var(--felt-1) 0%, var(--felt-2) 65%, #062e18 100%);
+    color:var(--ink);
+    -webkit-user-select:none; user-select:none;
+  }
+  #app{
+    position:fixed; inset:0;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:1.5vh 2vw;
+  }
+  .screen{
+    width:100%; max-width:1900px; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:1.8vh;
+    animation: fadeIn .4s ease-out;
+  }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  .hidden{ display:none !important; }
+
+  /* ---------- Marquee bulb strip ---------- */
+  .bulb-strip{
+    width:100%; max-width:1000px; height:14px;
+    background-image: radial-gradient(circle, var(--gold-bright) 0 35%, transparent 42%);
+    background-size: 34px 14px;
+    background-repeat: repeat-x;
+    background-position: center;
+    opacity:.85;
+    animation: twinkle 1.8s ease-in-out infinite;
+  }
+  .bulb-strip.alt{ animation-delay:.9s; }
+  @keyframes twinkle{ 0%,100%{opacity:.4;} 50%{opacity:.95;} }
+
+  h1.title{
+    font-size:clamp(34px,6.4vw,88px);
+    letter-spacing:3px;
+    color:var(--gold);
+    text-shadow:
+      0 2px 0 #7a5a12,
+      0 4px 0 #543c0b,
+      0 10px 24px rgba(0,0,0,.6),
+      0 0 46px rgba(243,209,121,.45);
+    margin:0;
+    text-align:center;
+    text-transform:uppercase;
+  }
+  .strapline{
+    font-size:clamp(12px,1.4vw,17px);
+    color:var(--muted);
+    font-style:italic;
+    letter-spacing:.5px;
+    text-align:center;
+    opacity:.85;
+    margin-top:-6px;
+  }
+  .tagline{
+    font-size:clamp(14px,1.9vw,22px);
+    color:var(--red);
+    background:#fdf8e8;
+    border:3px solid var(--red);
+    border-radius:10px;
+    padding:6px 22px;
+    font-weight:bold;
+    letter-spacing:1.5px;
+    text-align:center;
+    box-shadow:0 6px 16px rgba(0,0,0,.35);
+  }
+  .subtitle{ color:var(--muted); font-size:clamp(14px,1.8vw,20px); text-align:center; max-width:760px; line-height:1.55; }
+  .rules-banner{
+    color:var(--gold);
+    font-size:clamp(12px,1.5vw,17px);
+    text-align:center;
+    letter-spacing:.5px;
+    max-width:780px;
+    border-top:1px solid rgba(243,209,121,.35);
+    border-bottom:1px solid rgba(243,209,121,.35);
+    padding:8px 10px;
+  }
+
+  .gold-btn{
+    font-family:inherit;
+    font-size:clamp(18px,2.6vw,30px);
+    padding:0.8em 2.6em;
+    border-radius:999px;
+    border:3px solid var(--gold-dark);
+    background: linear-gradient(180deg, #fff1cc, var(--gold) 50%, var(--gold-dark));
+    color:#2a1d04;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow: 0 5px 0 #6b530c, 0 12px 24px rgba(0,0,0,.45);
+    transition: transform .08s ease;
+    letter-spacing:1.5px;
+  }
+  .gold-btn:hover{ filter:brightness(1.07); }
+  .gold-btn:active{ transform: translateY(4px); box-shadow: 0 1px 0 #6b530c, 0 6px 14px rgba(0,0,0,.4); }
+
+  /* ---------- Game screen ---------- */
+  .topbar{
+    width:100%; max-width:1300px; display:flex; justify-content:space-between; align-items:center;
+    padding:0 1vw;
+  }
+  .score-pill{
+    background:rgba(0,0,0,.4); border:2px solid var(--gold-dark); border-radius:999px;
+    padding:10px 24px; font-size:clamp(15px,1.8vw,22px); color:var(--muted);
+  }
+  .score-pill b{ color:var(--gold-bright); font-size:1.15em; }
+
+  .game-tagline{
+    font-size:clamp(13px,1.5vw,18px);
+    color:var(--red);
+    background:#fdf8e8;
+    border:2px solid var(--red);
+    border-radius:999px;
+    padding:6px 20px;
+    font-weight:bold;
+    letter-spacing:1.2px;
+    box-shadow:0 4px 10px rgba(0,0,0,.3);
+  }
+
+  .board-wrap{ display:flex; flex-direction:column; gap:14px; align-items:center; width:100%; }
+
+  .stage-frame{
+    position:relative;
+    padding:18px;
+    border-radius:22px;
+    background: linear-gradient(180deg, #d8ae3f, var(--gold-dark));
+    box-shadow: 0 18px 50px rgba(0,0,0,.55), 0 0 0 2px rgba(0,0,0,.25);
+  }
+
+  .board-flex{
+    display:flex; align-items:center; gap:clamp(18px,3.6vw,80px); justify-content:center;
+    background:#fdf8e8;
+    border:4px solid var(--red);
+    border-radius:16px;
+    padding:clamp(20px,3.6vw,60px);
+  }
+  .key-card-box{ display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .key-card-label{
+    font-size:clamp(12px,1.5vw,18px); color:var(--red); font-weight:bold; letter-spacing:1.5px;
+  }
+  .rows-stack{ display:flex; flex-direction:column; gap:clamp(12px,2.6vw,36px); }
+
+  .row{ display:flex; gap:clamp(10px,2.4vw,36px); justify-content:center; }
+
+  .slot{
+    width:clamp(60px,12vw,230px);
+    height:clamp(88px,17.6vw,338px);
+    border-radius:12px;
+    position:relative;
+    perspective:900px;
+  }
+  .key-card-box .slot{
+    width:clamp(72px,14vw,268px);
+    height:clamp(106px,20.6vw,394px);
+  }
+  .slot .card{
+    position:absolute; inset:0;
+    border-radius:10px;
+    transform-style:preserve-3d;
+    transition:transform .5s cubic-bezier(.2,.7,.3,1.05);
+  }
+  .slot.flipped .card{ transform:rotateY(180deg); }
+
+  .face, .back{
+    position:absolute; inset:0;
+    border-radius:10px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    backface-visibility:hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,.4);
+    border:2px solid rgba(0,0,0,.2);
+  }
+  .back{
+    background:
+      repeating-linear-gradient(45deg, var(--card-back) 0 10px, var(--card-back-2) 10px 20px);
+    border:3px solid var(--gold-dark);
+  }
+  .back::after{
+    content:"★";
+    color:var(--gold);
+    font-size:clamp(20px,4.2vw,62px);
+    opacity:.85;
+  }
+  .face{
+    background:#fff;
+    transform:rotateY(180deg);
+    color:#1a1a1a;
+    font-weight:bold;
+  }
+  .face .rank-top, .face .rank-bottom{
+    position:absolute; font-size:clamp(12px,2.1vw,30px); line-height:1;
+  }
+  .face .rank-top{ top:9px; left:10px; }
+  .face .rank-bottom{ bottom:9px; right:10px; transform:rotate(180deg); }
+  .face .suit-big{ font-size:clamp(22px,5.6vw,80px); }
+  .face.red{ color:var(--red); }
+  .face.blue{ color:#1a1a1a; }
+
+  .slot.active-target .back{
+    border-color:var(--gold-dark);
+    box-shadow: 0 0 0 4px rgba(212,38,56,.6), 0 6px 16px rgba(0,0,0,.4);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{filter:brightness(1);} 50%{filter:brightness(1.22);} }
+
+  .slot.wrong .face{ box-shadow: 0 0 0 4px var(--red), 0 6px 16px rgba(0,0,0,.4); }
+  .slot.correct .face{ box-shadow: 0 0 0 4px #1a9c4a, 0 6px 16px rgba(0,0,0,.4); }
+  .slot.bust .face{ box-shadow: 0 0 0 5px #ff3b3b, 0 0 24px rgba(255,59,59,.85); }
+
+  .guess-controls{ display:flex; gap:28px; align-items:center; justify-content:center; flex-wrap:wrap; }
+  .guess-btn{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    font-family:inherit; cursor:pointer;
+    background:rgba(0,0,0,.32); border:3px solid var(--gold-dark); border-radius:18px;
+    padding:18px 46px; color:var(--ink);
+    transition:transform .08s ease, background .15s;
+  }
+  .guess-btn:hover{ background:rgba(243,209,121,.18); }
+  .guess-btn:active{ transform:scale(.96); }
+  .guess-btn .arrow{ font-size:clamp(24px,3.4vw,40px); color:var(--gold); }
+  .guess-btn .lbl{ font-size:clamp(13px,1.7vw,18px); letter-spacing:1.5px; }
+  .guess-btn .key-hint{ font-size:clamp(10px,1.1vw,12px); color:var(--muted); letter-spacing:.5px; }
+  .guess-btn:disabled{ opacity:.3; cursor:default; }
+
+  .message{
+    min-height:1.6em; font-size:clamp(15px,2vw,22px); text-align:center; color:var(--ink);
+  }
+  .message.win{ color:#57d67b; font-weight:bold; }
+  .message.lose{ color:#ff8f8f; font-weight:bold; }
+  .message.bust{ color:#ff3b3b; font-weight:bold; }
+
+  .shortcut-strip{
+    display:flex; gap:22px; flex-wrap:wrap; justify-content:center;
+    font-size:clamp(11px,1.2vw,14px); color:var(--muted); letter-spacing:.3px;
+  }
+  .shortcut-strip kbd{
+    display:inline-block; min-width:1.6em; text-align:center;
+    background:rgba(0,0,0,.4); border:1px solid var(--gold-dark); border-radius:5px;
+    padding:2px 7px; color:var(--gold-bright); font-family:inherit; font-weight:bold;
+    margin-right:4px;
+  }
+
+  footer.note{
+    position:absolute; bottom:6px; left:0; right:0; text-align:center;
+    font-size:11px; color:rgba(188,211,194,.5);
+  }
+
+  .corner-btns{
+    position:fixed; top:16px; right:16px; z-index:50;
+    display:flex; gap:10px;
+  }
+  .corner-btns button{
+    background:rgba(0,0,0,.4); color:var(--ink); border:1px solid var(--gold-dark);
+    border-radius:8px; padding:9px 16px; cursor:pointer; font-family:inherit; font-size:14px;
+  }
+  .corner-btns button:hover{ background:rgba(0,0,0,.6); }
+
+  /* ---------- Full screen: let everything scale up further ---------- */
+  html:fullscreen .screen{ max-width:3400px; }
+  html:fullscreen h1.title{ font-size:clamp(40px,7.6vw,140px); }
+  html:fullscreen .tagline{ font-size:clamp(16px,2.3vw,28px); padding:8px 30px; }
+  html:fullscreen .subtitle{ font-size:clamp(16px,2vw,24px); max-width:920px; }
+  html:fullscreen .rules-banner{ font-size:clamp(14px,1.7vw,20px); max-width:940px; }
+  html:fullscreen .gold-btn{ font-size:clamp(20px,3vw,38px); padding:0.85em 2.8em; }
+  html:fullscreen .score-pill{ font-size:clamp(17px,2vw,27px); padding:12px 30px; }
+  html:fullscreen .game-tagline{ font-size:clamp(15px,1.7vw,22px); padding:8px 26px; }
+  html:fullscreen .board-flex{ gap:clamp(24px,4.6vw,110px); padding:clamp(28px,4.6vw,80px); }
+  html:fullscreen .rows-stack{ gap:clamp(16px,3.4vw,48px); }
+  html:fullscreen .row{ gap:clamp(14px,3.2vw,48px); }
+  html:fullscreen .slot{
+    width:clamp(80px,15.5vw,340px);
+    height:clamp(118px,22.8vw,500px);
+  }
+  html:fullscreen .key-card-box .slot{
+    width:clamp(96px,18vw,396px);
+    height:clamp(142px,26.4vw,582px);
+  }
+  html:fullscreen .back::after{ font-size:clamp(24px,5.4vw,92px); }
+  html:fullscreen .face .suit-big{ font-size:clamp(28px,7.2vw,118px); }
+  html:fullscreen .face .rank-top, html:fullscreen .face .rank-bottom{ font-size:clamp(14px,2.6vw,38px); }
+  html:fullscreen .guess-btn{ padding:20px 56px; }
+  html:fullscreen .guess-btn .arrow{ font-size:clamp(26px,4vw,48px); }
+  html:fullscreen .guess-btn .lbl{ font-size:clamp(14px,2vw,22px); }
+  html:fullscreen .guess-btn .key-hint{ font-size:clamp(11px,1.3vw,15px); }
+  html:fullscreen .message{ font-size:clamp(17px,2.3vw,26px); }
+  html:fullscreen .shortcut-strip{ font-size:clamp(12px,1.4vw,17px); gap:28px; }
+
+  @media (max-width: 760px){
+    .board-flex{ flex-direction:column; }
+    .row{ gap:6px; }
+    .guess-controls{ gap:12px; }
+    .guess-btn{ padding:12px 22px; }
+    .corner-btns{ flex-direction:column; align-items:flex-end; }
+    .bulb-strip{ display:none; }
+    .topbar{ flex-direction:column; gap:8px; margin-top:52px; }
+    html,body{ overflow-y:auto; }
+    #app{ position:static; min-height:100vh; padding-bottom:40px; }
+    .screen{ height:auto; min-height:0; }
+    footer.note{ position:static; margin-top:16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="corner-btns">
+  <button id="reset-btn" type="button">↺ Reset</button>
+  <button id="fullscreen-btn" type="button">⛶ Full screen</button>
+</div>
+
+<div id="app">
+
+  <!-- ===== START SCREEN ===== -->
+  <div class="screen" id="screen-start">
+    <div class="bulb-strip"></div>
+    <h1 class="title">Moët or Munch</h1>
+    <div class="strapline">A legally distinct game to Play Your Cards Right</div>
+    <div class="bulb-strip alt"></div>
+    <div class="tagline">"GOOD GAME... GOOD GAME!"</div>
+    <p class="subtitle">Flip the key card, then call the next eight — higher or lower — across both rows.</p>
+    <p class="rules-banner">Ace is high. Nothing for a pair — in this game, if the same card comes up twice in a row, you bomb out immediately!</p>
+    <button type="button" class="gold-btn" id="start-btn">Start the game</button>
+    <p class="subtitle" style="opacity:.8;font-size:14px;">No sign-up, no network connection — everything happens right here in your browser. Press Enter to start.</p>
+  </div>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <div class="screen hidden" id="screen-game">
+    <div class="topbar">
+      <div class="score-pill">Cleared: <b id="cleared-count">0</b></div>
+      <div class="game-tagline">"GOOD GAME... GOOD GAME!"</div>
+    </div>
+
+    <div class="board-wrap">
+      <div class="stage-frame">
+        <div class="board-flex">
+          <div class="key-card-box">
+            <div class="key-card-label">KEY CARD</div>
+            <div class="slot flipped" id="key-card-slot"><div class="card"><div class="back"></div><div class="face"></div></div></div>
+          </div>
+          <div class="rows-stack">
+            <div class="row" id="card-row-top"></div>
+            <div class="row" id="card-row-bottom"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guess-controls" id="guess-controls">
+      <button type="button" class="guess-btn" id="btn-lower">
+        <span class="arrow">▼</span><span class="lbl">LOWER</span>
+        <span class="key-hint">← or L</span>
+      </button>
+      <button type="button" class="guess-btn" id="btn-higher">
+        <span class="arrow">▲</span><span class="lbl">HIGHER</span>
+        <span class="key-hint">→ or H</span>
+      </button>
+    </div>
+
+    <div class="message" id="message">&nbsp;</div>
+
+    <button type="button" class="gold-btn hidden" id="btn-new-round">Deal next round</button>
+
+    <div class="shortcut-strip">
+      <span><kbd>←</kbd><kbd>L</kbd>Lower</span>
+      <span><kbd>→</kbd><kbd>H</kbd>Higher</span>
+      <span><kbd>Enter</kbd>Next round</span>
+      <span><kbd>R</kbd>Reset</span>
+      <span><kbd>F</kbd>Full screen</span>
+    </div>
+  </div>
+
+  <footer class="note">Moët or Munch — a legally distinct, self-contained edition. Ace is high and nothing for a pair, not in this game. All logic runs locally; nothing leaves this page.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------------------------------------------------------------
+  // Secure randomness helpers
+  // ---------------------------------------------------------------
+  function secureRandomInt(maxExclusive){
+    var range = maxExclusive;
+    var bytesNeeded = Math.ceil(Math.log2(range) / 8) || 1;
+    var maxValid = Math.floor(256 ** bytesNeeded / range) * range;
+    var buf = new Uint8Array(bytesNeeded);
+    while(true){
+      crypto.getRandomValues(buf);
+      var val = 0;
+      for(var i=0;i<bytesNeeded;i++){ val = val * 256 + buf[i]; }
+      if(val < maxValid){ return val % range; }
+    }
+  }
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = secureRandomInt(i+1);
+      var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+    }
+    return a;
+  }
+
+  // ---------------------------------------------------------------
+  // Deck — Ace is high (value 14), rank 1 is still labelled "A"
+  // ---------------------------------------------------------------
+  var RANK_NAMES = {1:"A",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9",10:"10",11:"J",12:"Q",13:"K"};
+  var SUITS = [
+    {symbol:"♠", color:"black"},
+    {symbol:"♣", color:"black"},
+    {symbol:"♥", color:"red"},
+    {symbol:"♦", color:"red"}
+  ];
+
+  function freshDeck(){
+    var deck = [];
+    for(var r=1;r<=13;r++){
+      for(var s=0;s<SUITS.length;s++){
+        deck.push({rank:r, suit:SUITS[s].symbol, color:SUITS[s].color});
+      }
+    }
+    return deck;
+  }
+
+  function rankValue(card){
+    return card.rank === 1 ? 14 : card.rank; // Ace high
+  }
+
+  var ROW_SIZE = 8;
+  var SUB_ROW = 4;
+
+  // ---------------------------------------------------------------
+  // Game state — single player, continuous rounds
+  // ---------------------------------------------------------------
+  var state = {
+    deck: [],
+    keyCard: null,
+    row: [],
+    revealedCount: 0,
+    cleared: 0,
+    roundOver: false
+  };
+
+  function drawCard(){
+    if(state.deck.length === 0){ state.deck = shuffle(freshDeck()); }
+    return state.deck.pop();
+  }
+
+  function beginRound(){
+    state.keyCard = drawCard();
+    state.row = [];
+    for(var i=0;i<ROW_SIZE;i++){ state.row.push(drawCard()); }
+    state.revealedCount = 0;
+    state.roundOver = false;
+  }
+
+  function resetGame(){
+    state.deck = shuffle(freshDeck());
+    state.cleared = 0;
+    beginRound();
+    setMessage("");
+    renderAll();
+  }
+
+  // ---------------------------------------------------------------
+  // Rendering
+  // ---------------------------------------------------------------
+  var elRowTop = document.getElementById("card-row-top");
+  var elRowBottom = document.getElementById("card-row-bottom");
+  var elKeySlot = document.getElementById("key-card-slot");
+  var elMessage = document.getElementById("message");
+  var elClearedCount = document.getElementById("cleared-count");
+  var btnHigher = document.getElementById("btn-higher");
+  var btnLower = document.getElementById("btn-lower");
+  var btnNewRound = document.getElementById("btn-new-round");
+
+  function cardFaceHTML(card){
+    var colorClass = card.color === "red" ? "red" : "blue";
+    var label = RANK_NAMES[card.rank];
+    return (
+      '<div class="face ' + colorClass + '">' +
+        '<span class="rank-top">' + label + ' ' + card.suit + '</span>' +
+        '<span class="suit-big">' + card.suit + '</span>' +
+        '<span class="rank-bottom">' + label + ' ' + card.suit + '</span>' +
+      '</div>'
+    );
+  }
+
+  function renderKeyCard(){
+    elKeySlot.innerHTML = '<div class="card"><div class="back"></div>' + cardFaceHTML(state.keyCard) + '</div>';
+  }
+
+  function renderRows(isTargetable){
+    elRowTop.innerHTML = "";
+    elRowBottom.innerHTML = "";
+    for(var i=0;i<ROW_SIZE;i++){
+      var card = state.row[i];
+      var slot = document.createElement("div");
+      slot.className = "slot";
+      var revealed = i < state.revealedCount;
+      if(revealed){ slot.classList.add("flipped"); }
+      if(isTargetable && i === state.revealedCount){ slot.classList.add("active-target"); }
+
+      var inner = document.createElement("div");
+      inner.className = "card";
+      inner.innerHTML =
+        '<div class="back"></div>' +
+        (revealed ? cardFaceHTML(card) : '<div class="face"></div>');
+      slot.appendChild(inner);
+
+      (i < SUB_ROW ? elRowTop : elRowBottom).appendChild(slot);
+    }
+  }
+
+  function slotElement(index){
+    return index < SUB_ROW ? elRowTop.children[index] : elRowBottom.children[index - SUB_ROW];
+  }
+
+  function flashSlot(index, kind){
+    var slot = slotElement(index);
+    if(!slot) return;
+    slot.classList.add(kind);
+    setTimeout(function(){ slot.classList.remove(kind); }, 900);
+  }
+
+  function setMessage(text, cls){
+    elMessage.textContent = text;
+    elMessage.className = "message" + (cls ? " " + cls : "");
+  }
+
+  function renderAll(){
+    var canAct = !state.roundOver;
+
+    renderKeyCard();
+    renderRows(canAct);
+    elClearedCount.textContent = state.cleared;
+
+    btnHigher.disabled = !canAct;
+    btnLower.disabled = !canAct;
+    btnNewRound.classList.toggle("hidden", !state.roundOver);
+  }
+
+  // ---------------------------------------------------------------
+  // Gameplay
+  // ---------------------------------------------------------------
+  function guess(direction){
+    if(state.roundOver) return;
+
+    var idx = state.revealedCount;
+    var prevVal = idx === 0 ? rankValue(state.keyCard) : rankValue(state.row[idx - 1]);
+    var next = state.row[idx];
+    var nextVal = rankValue(next);
+
+    var isPair = nextVal === prevVal;
+    var correct = !isPair && (direction === "higher" ? nextVal > prevVal : nextVal < prevVal);
+
+    state.revealedCount++;
+    renderRows(false);
+    btnHigher.disabled = true;
+    btnLower.disabled = true;
+
+    if(correct){
+      flashSlot(idx, "correct");
+      if(state.revealedCount === ROW_SIZE){
+        state.cleared++;
+        state.roundOver = true;
+        setMessage("You cleared the whole board — good game, good game! Click below for the next round.", "win");
+        renderAll();
+      } else {
+        btnHigher.disabled = false;
+        btnLower.disabled = false;
+        setMessage("Correct! Keep going.");
+      }
+      return;
+    }
+
+    flashSlot(idx, isPair ? "bust" : "wrong");
+    state.roundOver = true;
+    setTimeout(function(){
+      renderAll();
+      if(isPair){
+        setMessage("Pair! Same card twice in a row — instant bust. Click below to deal again.", "bust");
+      } else {
+        setMessage("Wrong! That's the round. Click below to deal again.", "lose");
+      }
+    }, 900);
+  }
+
+  function newRound(){
+    beginRound();
+    setMessage("");
+    renderAll();
+  }
+
+  // ---------------------------------------------------------------
+  // Wiring
+  // ---------------------------------------------------------------
+  var screenStart = document.getElementById("screen-start");
+  var screenGame = document.getElementById("screen-game");
+  var startBtn = document.getElementById("start-btn");
+
+  function startGame(){
+    screenStart.classList.add("hidden");
+    screenGame.classList.remove("hidden");
+    resetGame();
+  }
+  startBtn.addEventListener("click", startGame);
+
+  btnHigher.addEventListener("click", function(){ guess("higher"); });
+  btnLower.addEventListener("click", function(){ guess("lower"); });
+  btnNewRound.addEventListener("click", newRound);
+
+  document.getElementById("reset-btn").addEventListener("click", function(){
+    if(screenGame.classList.contains("hidden")){ return; }
+    resetGame();
+  });
+
+  // ---------------------------------------------------------------
+  // Fullscreen toggle
+  // ---------------------------------------------------------------
+  var fsBtn = document.getElementById("fullscreen-btn");
+  function toggleFullscreen(){
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(function(){ /* ignore if blocked */ });
+    } else {
+      document.exitFullscreen();
+    }
+  }
+  fsBtn.addEventListener("click", toggleFullscreen);
+  document.addEventListener("fullscreenchange", function(){
+    fsBtn.textContent = document.fullscreenElement ? "⛶ Exit full screen" : "⛶ Full screen";
+  });
+
+  // ---------------------------------------------------------------
+  // Keyboard shortcuts
+  // ---------------------------------------------------------------
+  document.addEventListener("keydown", function(e){
+    if(e.repeat) return;
+    var key = e.key;
+    var lower = key.toLowerCase();
+
+    // Start screen: Enter starts the game.
+    if(!screenGame || screenGame.classList.contains("hidden")){
+      if(key === "Enter" || key === " "){
+        e.preventDefault();
+        startGame();
+      }
+      return;
+    }
+
+    // Game screen.
+    if(lower === "f"){
+      e.preventDefault();
+      toggleFullscreen();
+      return;
+    }
+    if(lower === "r"){
+      e.preventDefault();
+      resetGame();
+      return;
+    }
+    if(!state.roundOver){
+      if(key === "ArrowLeft" || lower === "l"){
+        e.preventDefault();
+        guess("lower");
+      } else if(key === "ArrowRight" || lower === "h"){
+        e.preventDefault();
+        guess("higher");
+      }
+    } else if(key === "Enter" || key === " "){
+      e.preventDefault();
+      newRound();
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
