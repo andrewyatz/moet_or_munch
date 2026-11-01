@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'none'; connect-src 'none'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
-<title>Moët or Munch</title>
+<title>Prosecco or Pringles (formally Moët or Munch)</title>
 <style>
   :root{
     --felt-1:#0c6b33;
@@ -32,17 +32,20 @@
   }
   #app{
     position:fixed; inset:0;
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    padding:1.5vh 2vw;
+    overflow:hidden;
   }
+  /* The active .screen is centered and measured by JS, which applies a
+     scale() transform so the whole layout always fits the viewport,
+     regardless of any fixed-px chrome (borders, padding, gaps). */
   .screen{
-    width:100%; max-width:1900px; height:100%;
+    position:absolute; left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    width:max-content; max-width:1900px;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     gap:1.8vh;
     animation: fadeIn .4s ease-out;
   }
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+  @keyframes fadeIn{ from{opacity:0;} to{opacity:1;} }
   .hidden{ display:none !important; }
 
   /* ---------- Marquee bulb strip ---------- */
@@ -59,7 +62,7 @@
   @keyframes twinkle{ 0%,100%{opacity:.4;} 50%{opacity:.95;} }
 
   h1.title{
-    font-size:clamp(34px,6.4vw,88px);
+    font-size:clamp(28px,11.4vmin,88px);
     letter-spacing:3px;
     color:var(--gold);
     text-shadow:
@@ -72,7 +75,7 @@
     text-transform:uppercase;
   }
   .strapline{
-    font-size:clamp(12px,1.4vw,17px);
+    font-size:clamp(11px,2.5vmin,17px);
     color:var(--muted);
     font-style:italic;
     letter-spacing:.5px;
@@ -81,7 +84,7 @@
     margin-top:-6px;
   }
   .tagline{
-    font-size:clamp(14px,1.9vw,22px);
+    font-size:clamp(13px,3.4vmin,22px);
     color:var(--red);
     background:#fdf8e8;
     border:3px solid var(--red);
@@ -92,10 +95,10 @@
     text-align:center;
     box-shadow:0 6px 16px rgba(0,0,0,.35);
   }
-  .subtitle{ color:var(--muted); font-size:clamp(14px,1.8vw,20px); text-align:center; max-width:760px; line-height:1.55; }
+  .subtitle{ color:var(--muted); font-size:clamp(13px,3.2vmin,20px); text-align:center; max-width:760px; line-height:1.55; }
   .rules-banner{
     color:var(--gold);
-    font-size:clamp(12px,1.5vw,17px);
+    font-size:clamp(11px,2.7vmin,17px);
     text-align:center;
     letter-spacing:.5px;
     max-width:780px;
@@ -106,7 +109,7 @@
 
   .gold-btn{
     font-family:inherit;
-    font-size:clamp(18px,2.6vw,30px);
+    font-size:clamp(16px,4.6vmin,30px);
     padding:0.8em 2.6em;
     border-radius:999px;
     border:3px solid var(--gold-dark);
@@ -128,12 +131,12 @@
   }
   .score-pill{
     background:rgba(0,0,0,.4); border:2px solid var(--gold-dark); border-radius:999px;
-    padding:10px 24px; font-size:clamp(15px,1.8vw,22px); color:var(--muted);
+    padding:10px 24px; font-size:clamp(14px,3.2vmin,22px); color:var(--muted);
   }
   .score-pill b{ color:var(--gold-bright); font-size:1.15em; }
 
   .game-tagline{
-    font-size:clamp(13px,1.5vw,18px);
+    font-size:clamp(12px,2.7vmin,18px);
     color:var(--red);
     background:#fdf8e8;
     border:2px solid var(--red);
@@ -155,30 +158,30 @@
   }
 
   .board-flex{
-    display:flex; align-items:center; gap:clamp(18px,3.6vw,80px); justify-content:center;
+    display:flex; align-items:center; gap:clamp(10px,6.4vmin,80px); justify-content:center;
     background:#fdf8e8;
     border:4px solid var(--red);
     border-radius:16px;
-    padding:clamp(20px,3.6vw,60px);
+    padding:clamp(12px,6.4vmin,60px);
   }
   .key-card-box{ display:flex; flex-direction:column; align-items:center; gap:12px; }
   .key-card-label{
-    font-size:clamp(12px,1.5vw,18px); color:var(--red); font-weight:bold; letter-spacing:1.5px;
+    font-size:clamp(11px,2.7vmin,18px); color:var(--red); font-weight:bold; letter-spacing:1.5px;
   }
-  .rows-stack{ display:flex; flex-direction:column; gap:clamp(12px,2.6vw,36px); }
+  .rows-stack{ display:flex; flex-direction:column; gap:clamp(6px,4.6vmin,36px); }
 
-  .row{ display:flex; gap:clamp(10px,2.4vw,36px); justify-content:center; }
+  .row{ display:flex; gap:clamp(5px,4.3vmin,36px); justify-content:center; }
 
   .slot{
-    width:clamp(60px,12vw,230px);
-    height:clamp(88px,17.6vw,338px);
+    width:clamp(40px,21.3vmin,230px);
+    height:clamp(58px,31.3vmin,338px);
     border-radius:12px;
     position:relative;
     perspective:900px;
   }
   .key-card-box .slot{
-    width:clamp(72px,14vw,268px);
-    height:clamp(106px,20.6vw,394px);
+    width:clamp(48px,24.9vmin,268px);
+    height:clamp(70px,36.6vmin,394px);
   }
   .slot .card{
     position:absolute; inset:0;
@@ -204,7 +207,7 @@
   .back::after{
     content:"★";
     color:var(--gold);
-    font-size:clamp(20px,4.2vw,62px);
+    font-size:clamp(14px,7.5vmin,62px);
     opacity:.85;
   }
   .face{
@@ -214,11 +217,11 @@
     font-weight:bold;
   }
   .face .rank-top, .face .rank-bottom{
-    position:absolute; font-size:clamp(12px,2.1vw,30px); line-height:1;
+    position:absolute; font-size:clamp(9px,3.7vmin,30px); line-height:1;
   }
   .face .rank-top{ top:9px; left:10px; }
   .face .rank-bottom{ bottom:9px; right:10px; transform:rotate(180deg); }
-  .face .suit-big{ font-size:clamp(22px,5.6vw,80px); }
+  .face .suit-big{ font-size:clamp(16px,10vmin,80px); }
   .face.red{ color:var(--red); }
   .face.blue{ color:#1a1a1a; }
 
@@ -243,13 +246,13 @@
   }
   .guess-btn:hover{ background:rgba(243,209,121,.18); }
   .guess-btn:active{ transform:scale(.96); }
-  .guess-btn .arrow{ font-size:clamp(24px,3.4vw,40px); color:var(--gold); }
-  .guess-btn .lbl{ font-size:clamp(13px,1.7vw,18px); letter-spacing:1.5px; }
-  .guess-btn .key-hint{ font-size:clamp(10px,1.1vw,12px); color:var(--muted); letter-spacing:.5px; }
+  .guess-btn .arrow{ font-size:clamp(18px,6vmin,40px); color:var(--gold); }
+  .guess-btn .lbl{ font-size:clamp(11px,3vmin,18px); letter-spacing:1.5px; }
+  .guess-btn .key-hint{ font-size:clamp(9px,2vmin,12px); color:var(--muted); letter-spacing:.5px; }
   .guess-btn:disabled{ opacity:.3; cursor:default; }
 
   .message{
-    min-height:1.6em; font-size:clamp(15px,2vw,22px); text-align:center; color:var(--ink);
+    min-height:1.6em; font-size:clamp(13px,3.6vmin,22px); text-align:center; color:var(--ink);
   }
   .message.win{ color:#57d67b; font-weight:bold; }
   .message.lose{ color:#ff8f8f; font-weight:bold; }
@@ -257,7 +260,7 @@
 
   .shortcut-strip{
     display:flex; gap:22px; flex-wrap:wrap; justify-content:center;
-    font-size:clamp(11px,1.2vw,14px); color:var(--muted); letter-spacing:.3px;
+    font-size:clamp(10px,2.1vmin,14px); color:var(--muted); letter-spacing:.3px;
   }
   .shortcut-strip kbd{
     display:inline-block; min-width:1.6em; text-align:center;
@@ -281,35 +284,72 @@
   }
   .corner-btns button:hover{ background:rgba(0,0,0,.6); }
 
+  /* ---------- Round-end modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(4,14,8,.72);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+    animation: overlayFade .2s ease-out;
+  }
+  @keyframes overlayFade{ from{opacity:0;} to{opacity:1;} }
+  .modal-box{
+    background:#fdf8e8;
+    border:4px solid var(--gold-dark);
+    border-radius:20px;
+    padding:clamp(24px,5vmin,48px) clamp(26px,6vmin,56px);
+    max-width:min(92vw,560px);
+    text-align:center;
+    box-shadow:0 24px 60px rgba(0,0,0,.6);
+    animation: modalPop .28s cubic-bezier(.2,.8,.3,1.2);
+  }
+  @keyframes modalPop{ from{ transform:scale(.85); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .modal-title{
+    font-size:clamp(20px,4.5vmin,34px);
+    font-weight:bold;
+    letter-spacing:1px;
+    margin:0 0 10px;
+    text-transform:uppercase;
+  }
+  .modal-title.win{ color:#1a9c4a; }
+  .modal-title.lose{ color:var(--red); }
+  .modal-title.bust{ color:#b4121f; }
+  .modal-text{
+    font-size:clamp(14px,2.6vmin,19px);
+    color:#3a2b10;
+    margin:0 0 22px;
+    line-height:1.5;
+  }
+
   /* ---------- Full screen: let everything scale up further ---------- */
   html:fullscreen .screen{ max-width:3400px; }
-  html:fullscreen h1.title{ font-size:clamp(40px,7.6vw,140px); }
-  html:fullscreen .tagline{ font-size:clamp(16px,2.3vw,28px); padding:8px 30px; }
-  html:fullscreen .subtitle{ font-size:clamp(16px,2vw,24px); max-width:920px; }
-  html:fullscreen .rules-banner{ font-size:clamp(14px,1.7vw,20px); max-width:940px; }
-  html:fullscreen .gold-btn{ font-size:clamp(20px,3vw,38px); padding:0.85em 2.8em; }
-  html:fullscreen .score-pill{ font-size:clamp(17px,2vw,27px); padding:12px 30px; }
-  html:fullscreen .game-tagline{ font-size:clamp(15px,1.7vw,22px); padding:8px 26px; }
-  html:fullscreen .board-flex{ gap:clamp(24px,4.6vw,110px); padding:clamp(28px,4.6vw,80px); }
-  html:fullscreen .rows-stack{ gap:clamp(16px,3.4vw,48px); }
-  html:fullscreen .row{ gap:clamp(14px,3.2vw,48px); }
+  html:fullscreen h1.title{ font-size:clamp(32px,13.5vmin,140px); }
+  html:fullscreen .tagline{ font-size:clamp(14px,4.1vmin,28px); padding:8px 30px; }
+  html:fullscreen .subtitle{ font-size:clamp(14px,3.6vmin,24px); max-width:920px; }
+  html:fullscreen .rules-banner{ font-size:clamp(12px,3vmin,20px); max-width:940px; }
+  html:fullscreen .gold-btn{ font-size:clamp(17px,5.3vmin,38px); padding:0.85em 2.8em; }
+  html:fullscreen .score-pill{ font-size:clamp(15px,3.6vmin,27px); padding:12px 30px; }
+  html:fullscreen .game-tagline{ font-size:clamp(13px,3vmin,22px); padding:8px 26px; }
+  html:fullscreen .board-flex{ gap:clamp(12px,8.2vmin,110px); padding:clamp(14px,8.2vmin,80px); }
+  html:fullscreen .rows-stack{ gap:clamp(8px,6vmin,48px); }
+  html:fullscreen .row{ gap:clamp(6px,5.7vmin,48px); }
   html:fullscreen .slot{
-    width:clamp(80px,15.5vw,340px);
-    height:clamp(118px,22.8vw,500px);
+    width:clamp(44px,27.6vmin,340px);
+    height:clamp(64px,40.5vmin,500px);
   }
   html:fullscreen .key-card-box .slot{
-    width:clamp(96px,18vw,396px);
-    height:clamp(142px,26.4vw,582px);
+    width:clamp(52px,32vmin,396px);
+    height:clamp(76px,46.9vmin,582px);
   }
-  html:fullscreen .back::after{ font-size:clamp(24px,5.4vw,92px); }
-  html:fullscreen .face .suit-big{ font-size:clamp(28px,7.2vw,118px); }
-  html:fullscreen .face .rank-top, html:fullscreen .face .rank-bottom{ font-size:clamp(14px,2.6vw,38px); }
+  html:fullscreen .back::after{ font-size:clamp(16px,9.6vmin,92px); }
+  html:fullscreen .face .suit-big{ font-size:clamp(18px,12.8vmin,118px); }
+  html:fullscreen .face .rank-top, html:fullscreen .face .rank-bottom{ font-size:clamp(10px,4.6vmin,38px); }
   html:fullscreen .guess-btn{ padding:20px 56px; }
-  html:fullscreen .guess-btn .arrow{ font-size:clamp(26px,4vw,48px); }
-  html:fullscreen .guess-btn .lbl{ font-size:clamp(14px,2vw,22px); }
-  html:fullscreen .guess-btn .key-hint{ font-size:clamp(11px,1.3vw,15px); }
-  html:fullscreen .message{ font-size:clamp(17px,2.3vw,26px); }
-  html:fullscreen .shortcut-strip{ font-size:clamp(12px,1.4vw,17px); gap:28px; }
+  html:fullscreen .guess-btn .arrow{ font-size:clamp(20px,7.1vmin,48px); }
+  html:fullscreen .guess-btn .lbl{ font-size:clamp(12px,3.6vmin,22px); }
+  html:fullscreen .guess-btn .key-hint{ font-size:clamp(10px,2.3vmin,15px); }
+  html:fullscreen .message{ font-size:clamp(14px,4.1vmin,26px); }
+  html:fullscreen .shortcut-strip{ font-size:clamp(10px,2.5vmin,17px); gap:28px; }
 
   @media (max-width: 760px){
     .board-flex{ flex-direction:column; }
@@ -320,8 +360,11 @@
     .bulb-strip{ display:none; }
     .topbar{ flex-direction:column; gap:8px; margin-top:52px; }
     html,body{ overflow-y:auto; }
-    #app{ position:static; min-height:100vh; padding-bottom:40px; }
-    .screen{ height:auto; min-height:0; }
+    #app{ position:static; min-height:100vh; padding-bottom:40px; overflow:visible; }
+    .screen{
+      position:static; transform:none !important; width:100%; max-width:100%;
+      height:auto; min-height:0; padding:1.5vh 2vw;
+    }
     footer.note{ position:static; margin-top:16px; }
   }
 </style>
@@ -338,7 +381,7 @@
   <!-- ===== START SCREEN ===== -->
   <div class="screen" id="screen-start">
     <div class="bulb-strip"></div>
-    <h1 class="title">Moët or Munch</h1>
+    <h1 class="title">Prosecco or Pringles (formally Moët or Munch)</h1>
     <div class="strapline">A legally distinct game to Play Your Cards Right</div>
     <div class="bulb-strip alt"></div>
     <div class="tagline">"GOOD GAME... GOOD GAME!"</div>
@@ -383,8 +426,6 @@
 
     <div class="message" id="message">&nbsp;</div>
 
-    <button type="button" class="gold-btn hidden" id="btn-new-round">Deal next round</button>
-
     <div class="shortcut-strip">
       <span><kbd>←</kbd><kbd>L</kbd>Lower</span>
       <span><kbd>→</kbd><kbd>H</kbd>Higher</span>
@@ -394,7 +435,15 @@
     </div>
   </div>
 
-  <footer class="note">Moët or Munch — a legally distinct, self-contained edition. Ace is high and nothing for a pair, not in this game. All logic runs locally; nothing leaves this page.</footer>
+  <div class="modal-overlay hidden" id="round-modal">
+    <div class="modal-box">
+      <div class="modal-title" id="modal-title">Good game, good game!</div>
+      <div class="modal-text" id="modal-text">You cleared the whole board!</div>
+      <button type="button" class="gold-btn" id="btn-new-round">Deal next round</button>
+    </div>
+  </div>
+
+  <footer class="note">Prosecco or Pringles (formally Moët or Munch) — a legally distinct, self-contained edition. Ace is high and nothing for a pair, not in this game. All logic runs locally; nothing leaves this page.</footer>
 </div>
 
 <script>
@@ -480,6 +529,7 @@
   }
 
   function resetGame(){
+    hideRoundModal();
     state.deck = shuffle(freshDeck());
     state.cleared = 0;
     beginRound();
@@ -498,6 +548,20 @@
   var btnHigher = document.getElementById("btn-higher");
   var btnLower = document.getElementById("btn-lower");
   var btnNewRound = document.getElementById("btn-new-round");
+  var roundModal = document.getElementById("round-modal");
+  var modalTitle = document.getElementById("modal-title");
+  var modalText = document.getElementById("modal-text");
+
+  function showRoundModal(title, text, cls){
+    modalTitle.textContent = title;
+    modalTitle.className = "modal-title" + (cls ? " " + cls : "");
+    modalText.textContent = text;
+    roundModal.classList.remove("hidden");
+  }
+
+  function hideRoundModal(){
+    roundModal.classList.add("hidden");
+  }
 
   function cardFaceHTML(card){
     var colorClass = card.color === "red" ? "red" : "blue";
@@ -562,7 +626,7 @@
 
     btnHigher.disabled = !canAct;
     btnLower.disabled = !canAct;
-    btnNewRound.classList.toggle("hidden", !state.roundOver);
+    scheduleFit();
   }
 
   // ---------------------------------------------------------------
@@ -589,8 +653,8 @@
       if(state.revealedCount === ROW_SIZE){
         state.cleared++;
         state.roundOver = true;
-        setMessage("You cleared the whole board — good game, good game! Click below for the next round.", "win");
         renderAll();
+        showRoundModal("Good game, good game!", "You are a winner!", "win");
       } else {
         btnHigher.disabled = false;
         btnLower.disabled = false;
@@ -604,14 +668,15 @@
     setTimeout(function(){
       renderAll();
       if(isPair){
-        setMessage("Pair! Same card twice in a row — instant bust. Click below to deal again.", "bust");
+        showRoundModal("Nothing for a pair!", "Not in this game! That's an instant bust.", "bust");
       } else {
-        setMessage("Wrong! That's the round. Click below to deal again.", "lose");
+        showRoundModal("Oh no!", "You got it wrong — that's the round.", "lose");
       }
     }, 900);
   }
 
   function newRound(){
+    hideRoundModal();
     beginRound();
     setMessage("");
     renderAll();
@@ -624,10 +689,68 @@
   var screenGame = document.getElementById("screen-game");
   var startBtn = document.getElementById("start-btn");
 
+  // ---------------------------------------------------------------
+  // Fit-to-viewport: measure the active screen's natural size and
+  // scale it down just enough to fit, so nothing ever overflows or
+  // clips regardless of window size or aspect ratio. Skipped on
+  // narrow/mobile widths, which use normal scrolling flow instead.
+  // ---------------------------------------------------------------
+  var MOBILE_BREAKPOINT = 760;
+
+  var cornerBtns = document.querySelector(".corner-btns");
+  var footerNote = document.querySelector("footer.note");
+
+  function fitActiveScreen(){
+    var active = screenGame.classList.contains("hidden") ? screenStart : screenGame;
+
+    if(window.innerWidth <= MOBILE_BREAKPOINT){
+      screenStart.style.transform = "";
+      screenGame.style.transform = "";
+      screenStart.style.top = "";
+      screenGame.style.top = "";
+      return;
+    }
+
+    // Reserve a full-width band at the top for the fixed corner buttons,
+    // and another at the bottom for the footer credit, so the scaled
+    // content never visually collides with either.
+    var cornerRect = cornerBtns.getBoundingClientRect();
+    var topReserve = cornerRect.height > 0 ? cornerRect.height + 24 : 0;
+    var footerRect = footerNote.getBoundingClientRect();
+    var bottomReserve = footerRect.height > 0 ? footerRect.height + 20 : 0;
+    var margin = 16;
+
+    active.style.top = "0px";
+    active.style.transform = "translate(-50%,-50%) scale(1)";
+    var rect = active.getBoundingClientRect();
+
+    var availW = window.innerWidth - margin * 2;
+    var availH = window.innerHeight - topReserve - bottomReserve;
+    var scale = Math.min(1, availW / rect.width, availH / rect.height);
+    if(!isFinite(scale) || scale <= 0){ scale = 1; }
+
+    var centerY = topReserve + availH / 2;
+    active.style.top = centerY + "px";
+    active.style.transform = "translate(-50%,-50%) scale(" + scale + ")";
+  }
+
+  var fitScaleRaf = null;
+  function scheduleFit(){
+    if(fitScaleRaf !== null) return;
+    fitScaleRaf = requestAnimationFrame(function(){
+      fitScaleRaf = null;
+      fitActiveScreen();
+    });
+  }
+
+  window.addEventListener("resize", scheduleFit);
+  document.addEventListener("fullscreenchange", scheduleFit);
+
   function startGame(){
     screenStart.classList.add("hidden");
     screenGame.classList.remove("hidden");
     resetGame();
+    scheduleFit();
   }
   startBtn.addEventListener("click", startGame);
 
@@ -697,6 +820,8 @@
       newRound();
     }
   });
+
+  fitActiveScreen();
 
 })();
 </script>
